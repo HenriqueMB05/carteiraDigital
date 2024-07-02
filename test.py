@@ -151,3 +151,9 @@ while True:
     except ValueError:
         print('valor inválido')
         input()
+try:
+    # escreve em um arquivo json para quando o programa for aberto novamente os dados estejam lá
+    with open('Carteira.json', 'w') as file:
+        file.write(json.dumps(carteira))
+except IndexError:
+    print('finalizando programa')

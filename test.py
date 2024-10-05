@@ -23,6 +23,7 @@ def criaruser():
             print("Você não informou nenhum nome de usuário")
             break
 
+
 def mostraruser():
     print("Usuários")
     for i in carteira.keys():
@@ -31,8 +32,32 @@ def mostraruser():
     print('-'*25)
 
 
+def transf(nome1, nome2):
+    if nome2 in carteira and nome1 in carteira:
+        print(f'O seu saldo disponivel: R${carteira[nome1]['saldo']:.2f}')
+        transferir = float(input("O quanto você quer transferir\n>>> ")) 
+        if carteira[nome1]['saldo']>=transferir:
+            carteira[nome1]['saldo'] -= transferir
+            carteira[nome2]['saldo'] += transferir
+            carteira[nome1]['historico']['transferido'].append(transferir)
+            carteira[nome2]['historico']['recebido'].append(transferir)
+            print(f"saldo atual de {nome1}: R${carteira[nome1]['saldo']:,.2f} ")
+            print(f"saldo atual de {nome2}: R${carteira[nome2]['saldo']:,.2f} ")
+            input()
+        else:
+            print(f"{nome} não tem saldo suficiente para realizar essa transferencia!")
+            input()                            
+    elif nome2 not in carteira or nome1 not in carteira:
+        print(f"Usuário {nome1}/{nome2} inexistente!")
+        input()
+    elif not nome2 and not nome1:
+        print("Rapaz")
+        input()
+        return
+    
+
 try:
-    with open('\r../../carteira.json', 'r') as file:
+    with open('./carteira.json', 'r') as file:
         files = file.read()
         carteira = json.loads(files)
 
@@ -67,53 +92,25 @@ while True:
                             mostraruser()
                             print("Quem vai traferir para quem:")
                             print("Deixe a caixa em branco para sair da operação: ")
-                            nome, userchc = [str(x) for x in input(">>> ").split(' ')]
-                            if userchc in carteira and nome in carteira:
-                                print(f'O seu saldo disponivel: R${carteira[nome]['saldo']:.2f}')
-                                transferir = float(input("O quanto você quer transferir\n>>> "))  
-                                if carteira[nome]['saldo']>=transferir:
-                                    carteira[nome]['saldo'] -= transferir
-                                    carteira[userchc]['saldo'] += transferir
-                                    carteira[nome]['historico']['transferido'].append(transferir)
-                                    carteira[userchc]['historico']['recebido'].append(transferir)
-                                    print(f"saldo atual de {nome}: R${carteira[nome]['saldo']:,.2f} ")
-                                    print(f"saldo atual de {userchc}: R${carteira[userchc]['saldo']:,.2f} ")
-                                    input()
-                                    break
-                                else:
-                                    print(f"{nome} não tem saldo suficiente para realizar essa transferencia!")
-                                    input()
-                            elif userchc not in carteira or nome not in carteira:
-                                print(f"Usuário {nome}/{userchc} inexistente!")
-                                input()
-                            elif not userchc and not nome:
+                            try:
+                                nome1, nome2 = input(">>> ").split(' ')
+                            except ValueError as err:
+                                print(err)
                                 break
+                            transf(nome1, nome2)
+                            break
                     # Um usuário irá receber o valor de outro usuário, pedindo o nome de quem vai receber de quem irá tirar o valor do primeiro e inserir na conta do segundo
                     case 2:
                         mostraruser()
                         print("Quem vai receber de quem: ")
                         print("Deixe a caixa em branco para sair da operação: ")
-                        nome, userchc = [str(x) for x in input().split(' ')]
-                        if nome in carteira and userchc in carteira:
-                            receber = float(input("O quanto você vai receber\n>>>"))
-                            moeda = str(input(">>> ")).capitalize().strip()
-                            if carteira[userchc]['saldo']>=receber:
-                                carteira[userchc]['saldo'] -= receber
-                                carteira[nome]['saldo'] += receber
-                                carteira[nome]['historico']['recebido'].append(receber)
-                                carteira[userchc]['historico']['transferido'].append(receber)
-                                print(f"Saldo atual de {userchc}: R${carteira[userchc]['saldo']:,.2f} ")
-                                print(f"Saldo atual de {nome}: R${carteira[nome]['saldo']:,.2f} ")
-                                input()
-                                break
-                            else:
-                                print(f"{userchc} não tem saldo suficiente para realizar essa transferencia!")
-                                input()
-                        elif nome not in carteira or userchc not in carteira:
-                            print(f'Usuário: {nome}/{userchc} inexistente')
-                            input()
-                        elif not nome and not userchc:
-                            break
+                        try:
+                            nome1, nome2 = input(">>> ").split(' ')
+                        except ValueError as err:
+                            print(err)
+                            break   
+                        transf(nome2, nome1)
+                        break
                     case 3:
                         mostraruser()
                         print('De quem você deseja ver o saldo: ')
